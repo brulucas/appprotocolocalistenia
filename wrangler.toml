@@ -3,6 +3,6 @@ compatibility_date = "2026-09-29"
 pages_build_output_dir = "."
 
 [[kv_namespaces]]
-binding = "HOTMART_APP"
+binding = "ACCESS_KV"
 id = "bc020fae6b904ec78283608e6f64c118"
 preview_id = "bc020fae6b904ec78283608e6f64c118"
