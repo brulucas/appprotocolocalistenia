@@ -5,5 +5,5 @@ pages_build_output_dir = "."
 # Replace these placeholders with the KV namespace IDs from Cloudflare.
 [[kv_namespaces]]
 binding = "ACCESS_KV"
-id = "COLOQUE_O_ID_DA_NAMESPACE_KV"
-preview_id = "COLOQUE_O_ID_DA_NAMESPACE_KV_PREVIEW"
+id = "bc020fae6b904ec78283608e6f64c118"
+preview_id = "bc020fae6b904ec78283608e6f64c118"
