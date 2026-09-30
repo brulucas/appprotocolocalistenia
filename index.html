@@ -82,9 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const ACCESS_KEY = 'calistenia.access';
   const PRODUCTS = {
     main: { id: '8624726', name: 'Protocolo de 21 días', url: 'https://pay.hotmart.com/Q107824749S?off=k01suv1q' },
-    bonus1: { id: '8625421', name: 'Bono 1', url: 'https://pay.hotmart.com/E107825982G?off=qan5s17k' },
-    bonus2: { id: '8625342', name: 'Bono 2', url: 'https://pay.hotmart.com/M107826145F?off=uwk9lei2' },
-    bonus3: { id: '8625393', name: 'Bono 3', url: 'https://pay.hotmart.com/O107826089J?off=w0gj1zdu' }
+    bonus1: { id: '8625421', name: 'PROTOCOLO DE SUEÑO', url: 'https://pay.hotmart.com/M107826145F?off=uwk9lei2' },
+    bonus2: { id: '8625342', name: 'NUTRICIÓN TÁCTICA', url: 'https://pay.hotmart.com/E107825982G?off=qan5s17k' },
+    bonus3: { id: '8625393', name: 'PROTOCOLO PRESIDENCIAL', url: 'https://pay.hotmart.com/O107826089J?off=w0gj1zdu' }
   };
   let deferredInstallPrompt = null;
   let appLoaded = false;
@@ -93,7 +93,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedEmail = () => localStorage.getItem(EMAIL_KEY) || '';
   const savedAccess = () => { try { return JSON.parse(localStorage.getItem(ACCESS_KEY) || 'null'); } catch { return null; } };
   const saveAccess = (email, products) => localStorage.setItem(ACCESS_KEY, JSON.stringify({ email, products, checkedAt: Date.now() }));
-  const checkout = (url, email) => `${url}&email=${encodeURIComponent(email)}`;
+  const checkout = (url, email) => `${url}${url.includes('?') ? '&' : '?'}email=${encodeURIComponent(email)}`;
+  const addBuyerEmail = (value) => {
+    try {
+      const url = new URL(value, location.href);
+      if (url.hostname !== 'pay.hotmart.com') return value;
+      const email = savedEmail();
+      if (email) url.searchParams.set('email', email);
+      return url.toString();
+    } catch { return value; }
+  };
+  const adaptHotmartLinks = () => {
+    document.querySelectorAll('a[href*="pay.hotmart.com"]').forEach((anchor) => {
+      const next = addBuyerEmail(anchor.href);
+      if (next !== anchor.href) anchor.href = next;
+    });
+  };
+  document.addEventListener('click', (event) => {
+    const anchor = event.target.closest?.('a[href*="pay.hotmart.com"]');
+    if (anchor) anchor.href = addBuyerEmail(anchor.href);
+  }, true);
+  const originalOpen = window.open;
+  window.open = function(url, ...args) {
+    return originalOpen.call(this, addBuyerEmail(url), ...args);
+  };
+  new MutationObserver(adaptHotmartLinks).observe(document.documentElement, { childList: true, subtree: true });
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 
@@ -142,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const launchApp = (email) => {
     if (appLoaded) return;
     appLoaded = true;
+    adaptHotmartLinks();
     const script = document.createElement('script'); script.type = 'module'; script.crossOrigin = 'anonymous'; script.src = APP_BUNDLE; document.head.appendChild(script);
     const toolbar = document.createElement('div'); toolbar.className = 'access-toolbar'; toolbar.innerHTML = `<button id="openBonuses">Bonos</button><button id="changeEmailInApp">Trocar e-mail</button>${installButton()}`; document.body.appendChild(toolbar); wireInstall();
     document.getElementById('openBonuses')?.addEventListener('click', () => showBonusPanel(email));
