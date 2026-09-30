@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Desafío 21 Días: Calistenia Militar</title>
+  <link rel="icon" type="image/png" href="/logoxd.png" />
+  <link rel="apple-touch-icon" href="/logoxd.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Desafío 21">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Inter:wght@300;400;600&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1a1d1a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #4b5e4b;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #8da38d;
+    }
+
+    body {
+      background-color: #0f110f;
+      color: #e5e7eb;
+    }
+  </style>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tactical: {
+              bg: '#0f110f',
+              surface: '#1a1d1a',
+              olive: '#4b5e4b',
+              sage: '#8da38d',
+              textHigh: '#e5e7eb',
+              textLow: '#8da38d',
+            }
+          },
+          fontFamily: {
+            impact: ['"Black Ops One"', 'cursive'],
+            tech: ['"Share Tech Mono"', 'monospace'],
+            sans: ['"Inter"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.554.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const APP_BUNDLE = '/assets/index-7wfL7imm.js';
+  const EMAIL_KEY = 'calistenia.email';
+  const ACCESS_KEY = 'calistenia.access';
+  const PRODUCTS = {
+    main: { id: '8624726', name: 'Protocolo de 21 días', url: 'https://pay.hotmart.com/Q107824749S?off=k01suv1q' },
+    bonus1: { id: '8625421', name: 'Bono 1', url: 'https://pay.hotmart.com/E107825982G?off=qan5s17k' },
+    bonus2: { id: '8625342', name: 'Bono 2', url: 'https://pay.hotmart.com/M107826145F?off=uwk9lei2' },
+    bonus3: { id: '8625393', name: 'Bono 3', url: 'https://pay.hotmart.com/O107826089J?off=w0gj1zdu' }
+  };
+  let deferredInstallPrompt = null;
+  let appLoaded = false;
+  const root = document.getElementById('root');
+  const emailIsValid = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const savedEmail = () => localStorage.getItem(EMAIL_KEY) || '';
+  const savedAccess = () => { try { return JSON.parse(localStorage.getItem(ACCESS_KEY) || 'null'); } catch { return null; } };
+  const saveAccess = (email, products) => localStorage.setItem(ACCESS_KEY, JSON.stringify({ email, products, checkedAt: Date.now() }));
+  const checkout = (url, email) => `${url}&email=${encodeURIComponent(email)}`;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+
+  const installButton = () => {
+    if (standalone || (!deferredInstallPrompt && !isIOS)) return '';
+    return `<button id="installApp" class="access-secondary">⬇ Instalar app</button>`;
+  };
+  const installHelp = () => isIOS && !standalone ? `<p class="ios-help">Para instalar: toque em <strong>Compartilhar</strong> e depois em <strong>Adicionar à Tela de Início</strong>.</p>` : '';
+  const wireInstall = () => {
+    document.getElementById('installApp')?.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      document.getElementById('installApp')?.remove();
+    });
+  };
+  const baseStyles = `<style id="accessStyles">
+    .access-screen{min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 0%,#1b2a1c 0,#0f110f 42%,#080a08 100%);font-family:Inter,system-ui,sans-serif;color:#e5e7eb}.access-card{width:min(100%,460px);padding:32px 24px;border:1px solid #405143;border-radius:18px;background:#121714;box-shadow:0 18px 60px #0008;text-align:center}.access-card h1{margin:15px 0 10px;font-size:clamp(25px,7vw,38px);line-height:1.05;text-transform:uppercase}.access-card p{color:#9da49e;line-height:1.55}.access-input{width:100%;padding:15px 16px;border:1px solid #526653;border-radius:10px;background:#0d120e;color:#fff;font-size:16px;outline:0}.access-input:focus{border-color:#8db889;box-shadow:0 0 0 3px #6fb56a33}.access-primary{width:100%;margin-top:14px;padding:15px;border:0;border-radius:9px;background:linear-gradient(110deg,#72b767,#4c9b50);color:#fff;font-weight:900;cursor:pointer}.access-secondary{margin:14px 6px 0;padding:9px 12px;border:1px solid #526653;border-radius:8px;background:transparent;color:#b9c7b9;cursor:pointer}.access-error{min-height:20px;color:#e58e8e;font-size:13px}.access-list{display:grid;gap:10px;margin:22px 0;text-align:left}.access-item{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #334438;border-radius:10px;background:#101511}.access-item strong{display:block}.access-item small{color:#9da49e}.access-item a{margin-left:auto;white-space:nowrap;color:#d7e9d2}.access-status{font:11px monospace;color:#758b78;letter-spacing:.08em}.ios-help{font-size:12px!important;color:#b7c9b6!important}.access-lock{font-size:44px}.access-top{font:10px monospace;color:#8db889;letter-spacing:.14em}.access-toolbar{position:fixed;z-index:9999;right:12px;bottom:12px;display:flex;gap:6px}.access-toolbar button{padding:8px 10px;border:1px solid #526653;border-radius:8px;background:#101511dd;color:#dbe8d8;font:11px monospace;cursor:pointer}
+  </style>`;
+  const ensureStyles = () => { if (!document.getElementById('accessStyles')) document.head.insertAdjacentHTML('beforeend', baseStyles); };
+  const showEmail = (message = '') => {
+    ensureStyles();
+    root.innerHTML = `<main class="access-screen"><section class="access-card"><div class="access-top">RECLUTAMIENTO DIGITAL // ACCESO SEGURO</div><div class="access-lock">🎖️</div><h1>Accede a tu protocolo</h1><p>Escribe el e-mail usado en tu compra para verificar tu acceso.</p><form id="emailForm"><input id="buyerEmail" class="access-input" type="email" autocomplete="email" placeholder="tu@email.com" required><div class="access-error">${message}</div><button class="access-primary" type="submit">CONTINUAR</button></form>${installButton()}${installHelp()}</section></main>`;
+    wireInstall();
+    document.getElementById('buyerEmail')?.focus();
+    document.getElementById('emailForm')?.addEventListener('submit', async (event) => { event.preventDefault(); const email = document.getElementById('buyerEmail').value.trim().toLowerCase(); if (!emailIsValid(email)) return showEmail('Escribe un e-mail válido.'); localStorage.setItem(EMAIL_KEY, email); await verify(email); });
+  };
+  const showChecking = (email) => { ensureStyles(); root.innerHTML = `<main class="access-screen"><section class="access-card"><div class="access-lock">⟳</div><h1>Verificando acceso</h1><p>Consultando tu compra para ${email}...</p><p class="access-status">SISTEMA EN LÍNEA // ESPERA UN MOMENTO</p></section></main>`; };
+  const showLocked = (email, offline = false) => {
+    ensureStyles();
+    const items = Object.values(PRODUCTS).map((product, i) => `<div class="access-item"><span>${product.id === PRODUCTS.main.id ? '🔒' : '🎁'}</span><div><strong>${product.name}</strong><small>${product.id === PRODUCTS.main.id ? 'Necesario para abrir el app' : 'Contenido adicional'}</small></div><a href="${checkout(product.url, email)}" target="_blank" rel="noopener">Desbloquear</a></div>`).join('');
+    root.innerHTML = `<main class="access-screen"><section class="access-card"><div class="access-lock">🔒</div><h1>Compra necesaria</h1><p>${offline ? 'No fue posible conectarse. Verifica tu conexión y vuelve a intentarlo.' : 'No encontramos una compra aprobada para este e-mail.'}</p><div class="access-list">${items}</div><button id="refreshAccess" class="access-primary">YA PAGUÉ, ACTUALIZAR</button><button id="changeEmail" class="access-secondary">Cambiar e-mail</button>${installButton()}${installHelp()}</section></main>`;
+    wireInstall();
+    document.getElementById('refreshAccess')?.addEventListener('click', () => verify(email));
+    document.getElementById('changeEmail')?.addEventListener('click', () => { localStorage.removeItem(EMAIL_KEY); showEmail(); });
+  };
+  const showBonusPanel = (email) => {
+    document.getElementById('bonusPanel')?.remove();
+    const access = savedAccess()?.products || [];
+    const has = (id) => access.map(String).map(x => x.toLowerCase()).includes(id);
+    const rows = [PRODUCTS.bonus1, PRODUCTS.bonus2, PRODUCTS.bonus3].map((product) => has(product.id) ? `<div class="access-item"><span>✅</span><div><strong>${product.name}</strong><small>Contenido desbloqueado</small></div><span>ABIERTO</span></div>` : `<div class="access-item"><span>🔒</span><div><strong>${product.name}</strong><small>Disponible como bono</small></div><a href="${checkout(product.url, email)}" target="_blank" rel="noopener">Desbloquear</a></div>`).join('');
+    const panel = document.createElement('div'); panel.id = 'bonusPanel'; panel.className = 'access-screen'; panel.style.position = 'fixed'; panel.style.inset = '0'; panel.style.zIndex = '10000'; panel.innerHTML = `<section class="access-card"><div class="access-top">CONTENIDO ADICIONAL</div><h1>Bonos</h1><p>Estado de los contenidos adicionales asociados a tu e-mail.</p><div class="access-list">${rows}</div><button id="closeBonus" class="access-secondary">Cerrar</button></section>`; document.body.appendChild(panel); document.getElementById('closeBonus')?.addEventListener('click', () => panel.remove());
+  };
+  window.CalisteniaAccess = { has: (id) => (savedAccess()?.products || []).map(String).map(x => x.toLowerCase()).includes(String(id).toLowerCase()), email: () => savedEmail() };
+  const launchApp = (email) => {
+    if (appLoaded) return;
+    appLoaded = true;
+    const script = document.createElement('script'); script.type = 'module'; script.crossOrigin = 'anonymous'; script.src = APP_BUNDLE; document.head.appendChild(script);
+    const toolbar = document.createElement('div'); toolbar.className = 'access-toolbar'; toolbar.innerHTML = `<button id="openBonuses">Bonos</button><button id="changeEmailInApp">Trocar e-mail</button>${installButton()}`; document.body.appendChild(toolbar); wireInstall();
+    document.getElementById('openBonuses')?.addEventListener('click', () => showBonusPanel(email));
+    document.getElementById('changeEmailInApp')?.addEventListener('click', () => { localStorage.removeItem(EMAIL_KEY); localStorage.removeItem(ACCESS_KEY); location.reload(); });
+  };
+  const verify = async (email) => {
+    showChecking(email);
+    try {
+      const response = await fetch('/api/check-access', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email }) });
+      if (!response.ok) throw new Error('access check failed');
+      const data = await response.json(); saveAccess(email, data.products || []);
+      if ((data.products || []).map(String).map(x => x.toLowerCase()).includes(PRODUCTS.main.id)) launchApp(email); else showLocked(email);
+    } catch {
+      const cached = savedAccess();
+      if (cached?.email === email && (cached.products || []).map(String).map(x => x.toLowerCase()).includes(PRODUCTS.main.id)) launchApp(email); else showLocked(email, true);
+    }
+  };
+  window.addEventListener('beforeinstallprompt', (event) => { event.preventDefault(); deferredInstallPrompt = event; document.querySelectorAll('#installApp').forEach((button) => button.style.display = 'inline-block'); });
+  window.addEventListener('appinstalled', () => { deferredInstallPrompt = null; document.querySelectorAll('#installApp').forEach((button) => button.remove()); });
+  window.addEventListener('pageshow', () => { const email = savedEmail(); if (email && document.querySelector('.access-toolbar')) verify(email); });
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => undefined));
+  const email = savedEmail(); email ? verify(email) : showEmail();
+});
+</script>
+</head>
+
+<body>
+  <div id="root"></div>
+</body>
+
+</html>
